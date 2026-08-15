@@ -58,7 +58,7 @@ Every page object extends `BasePage`, which provides `perform()` (wraps a single
 - **API-based setup and cleanup** — the `registeredUser` fixture creates a throwaway account through the API and deletes it after the test, so UI and e2e tests get a clean authenticated user without ever driving the registration UI for setup.
 - **UI + API integration** — see [`tests/e2e`](tests/e2e): API-seeded data verified in the real Notes App UI, a UI action (toggling a note's completed switch) verified against the backend via the API, and a full file upload → download round trip with content verification.
 - **Custom Extent-style HTML report** — a single self-contained `extent-report/index.html` with collapsible BDD-style steps, action-level logs, action-level screenshots (only on the last action of each step), search/filter, and light/dark mode. See [Reporting](#reporting) below.
-- **CircleCI** — three independent, tag-scoped workflows (smoke on `main`, critical weekly, regression on `release/*`). See [CI/CD](#cicd).
+- **CircleCI** — three independent, tag-scoped workflows (smoke on `master`, critical weekly, regression on `release/*`). See [CI/CD](#cicd).
 
 ## Setup
 
@@ -171,20 +171,20 @@ Every action also prints a line to stdout as it runs (via `src/utils/stepLogger.
 
 | Workflow                | Jobs                                                             | Trigger                                         |
 | ----------------------- | ---------------------------------------------------------------- | ----------------------------------------------- |
-| `smoke-on-main`         | `smoke` — Chromium only                                          | Every push to `main`                            |
+| `smoke-on-master`       | `smoke` — Chromium only                                          | Every push to `master`                          |
 | `critical-weekly`       | `critical` — Chromium only                                       | Scheduled — every **Monday 06:00 UTC**          |
 | `regression-on-release` | `regression-chromium`, `regression-firefox`, `regression-webkit` | Every push to a `release` or `release/*` branch |
 
 ```
-main            →  @smoke        →  Extent report
+master          →  @smoke        →  Extent report
 weekly schedule →  @critical     →  Extent report
 release/*       →  @regression   →  Extent report
 ```
 
-- The smoke suite is deliberately tiny (see [Suite commands](#suite-commands)) so `main` gets fast feedback.
+- The smoke suite is deliberately tiny (see [Suite commands](#suite-commands)) so `master` gets fast feedback.
 - `regression-on-release` runs Chromium, Firefox, and WebKit as three parallel jobs (not one sequential job covering all three), so wall-clock time is roughly the slowest browser instead of the sum of all three.
-- Each of those three jobs is _also_ split across 2 containers via CircleCI's `parallelism` plus Playwright's own `--shard` — so a single release-branch push runs 6 containers total (`test-results`/`extent-report` are uploaded per-container, visible as separate nodes in the Artifacts tab). `parallelism` is a parameter on the shared `test` job (default `1`, a no-op — `--shard=1/1` just means "run everything"), so `smoke`/`critical` are unaffected; bump `parallelism: 2` on any of the three regression jobs in `.circleci/config.yml` independently (e.g. chromium's suite is heavier since API tests only run there) to trade more concurrent containers for a shorter wall-clock time.
-- A normal commit to `main` never triggers the full regression suite — only a push to a `release`/`release/*` branch does.
+- Each of those three jobs is _also_ split across 5 containers via CircleCI's `parallelism` plus Playwright's own `--shard` — so a single release-branch push runs 15 containers total (`test-results`/`extent-report` are uploaded per-container, visible as separate nodes in the Artifacts tab). `parallelism` is a parameter on the shared `test` job (default `1`, a no-op — `--shard=1/1` just means "run everything"), so `smoke`/`critical` are unaffected; adjust `parallelism: 5` on any of the three regression jobs in `.circleci/config.yml` independently (e.g. chromium's suite is heavier since API tests only run there) to trade more concurrent containers for a shorter wall-clock time.
+- A normal commit to `master` never triggers the full regression suite — only a push to a `release`/`release/*` branch does.
 - To change the schedule or branch patterns, edit the `filters`/`cron` values in `.circleci/config.yml`.
 
 **Artifacts** — every job stores, regardless of pass/fail:

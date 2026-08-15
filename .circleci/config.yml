@@ -47,16 +47,16 @@ jobs:
           destination: extent-report
 
 workflows:
-  # Fast sanity check on every push to main — kept to 1-3 tests (see @smoke
-  # tag in tests/) so feedback stays quick.
-  smoke-on-main:
+  # Fast sanity check on every push to master — kept to 1-3 tests (see
+  # @smoke tag in tests/) so feedback stays quick.
+  smoke-on-master:
     jobs:
       - test:
           name: smoke
           tag: "@smoke"
           filters:
             branches:
-              only: main
+              only: master
 
   # Core auth/UI/API/file-upload workflows, once a week rather than on every
   # push — see README for the schedule rationale.
