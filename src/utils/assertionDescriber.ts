@@ -116,6 +116,13 @@ export function buildPassDescription(
     // would read as "Assert visible is visible: true".
     if (prop in BOOLEAN_STATE_MATCHERS) return `Assert ${label ?? 'element'} is ${BOOLEAN_STATE_MATCHERS[prop]}: true`;
     if (prop === 'toContainText') return `Assert ${fieldLabel} contains: ${formatAssertionValue(args[0])}`;
+    // toHaveAttribute(name, value) takes the attribute *name* as args[0] and
+    // the expected *value* as args[1] — showing args[0] here would print
+    // the attribute name ("src") instead of what was actually being
+    // checked against it.
+    if (prop === 'toHaveAttribute' && args.length >= 2) {
+      return `Assert ${label ?? `${fieldLabel} "${String(args[0])}"`}: ${formatAssertionValue(args[1])}`;
+    }
     if (args.length) return `Assert ${fieldLabel}: ${formatAssertionValue(args[0])}`;
     return `Assert ${fieldLabel}`;
   }
@@ -172,6 +179,11 @@ export async function buildFailDescription(
     if (prop === 'toHaveCount') {
       const actual = await safeRead(() => subject.count());
       return `Assert ${fieldLabel} FAILED — Expected: ${not}${formatAssertionValue(args[0])}, Actual: ${actual}`;
+    }
+    if (prop === 'toHaveAttribute' && args.length >= 2) {
+      const attrLabel = label ?? `${fieldLabel} "${String(args[0])}"`;
+      const actual = await safeRead(() => subject.getAttribute(String(args[0])));
+      return `Assert ${attrLabel} FAILED — Expected: ${not}${formatAssertionValue(args[1])}, Actual: ${actual}`;
     }
     if (args.length && typeof args[0] !== 'object') {
       return `Assert ${fieldLabel} FAILED — Expected: ${not}${formatAssertionValue(args[0])}`;

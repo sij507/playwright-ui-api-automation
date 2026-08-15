@@ -9,6 +9,9 @@ import { DynamicTablePage } from '../pages/DynamicTablePage';
 import { NotificationMessagePage } from '../pages/NotificationMessagePage';
 import { JsDialogsPage } from '../pages/JsDialogsPage';
 import { RedirectorPage } from '../pages/RedirectorPage';
+import { FormValidationPage } from '../pages/FormValidationPage';
+import { WindowsPage } from '../pages/WindowsPage';
+import { IframePage } from '../pages/IframePage';
 import { NotesLoginPage } from '../pages/notes-app/NotesLoginPage';
 import { NotesListPage } from '../pages/notes-app/NotesListPage';
 import { captureStep, captureStepFailure } from '../utils/screenshotRecorder';
@@ -38,6 +41,9 @@ export interface UiFixtures {
   notificationMessagePage: NotificationMessagePage;
   jsDialogsPage: JsDialogsPage;
   redirectorPage: RedirectorPage;
+  formValidationPage: FormValidationPage;
+  windowsPage: WindowsPage;
+  iframePage: IframePage;
   notesLoginPage: NotesLoginPage;
   notesListPage: NotesListPage;
   /** BDD-style step wrapper for the extent-report: step(title, fn) / step.given|when|then|and|but(title, fn). */
@@ -116,6 +122,9 @@ export const test = apiTest.extend<UiFixtures>({
   notificationMessagePage: async ({ page }, use) => use(new NotificationMessagePage(page)),
   jsDialogsPage: async ({ page }, use) => use(new JsDialogsPage(page)),
   redirectorPage: async ({ page }, use) => use(new RedirectorPage(page)),
+  formValidationPage: async ({ page }, use) => use(new FormValidationPage(page)),
+  windowsPage: async ({ page }, use) => use(new WindowsPage(page)),
+  iframePage: async ({ page }, use) => use(new IframePage(page)),
   notesLoginPage: async ({ page }, use) => use(new NotesLoginPage(page)),
   notesListPage: async ({ page }, use) => use(new NotesListPage(page)),
 

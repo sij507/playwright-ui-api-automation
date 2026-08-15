@@ -30,3 +30,15 @@ export const dialogMessages = {
   confirmDismissedResponse: 'Cancel',
   promptDialogText: 'I am a Js prompt',
 };
+
+// The site's own Bootstrap "invalid-feedback" copy for each required field
+// on /form-validation — including its one typo ("Paymeny"), preserved
+// verbatim since the assertion is against the real rendered text.
+export const formValidationMessages = {
+  contactNameRequired: 'Please enter your Contact name.',
+  contactNumberRequired: 'Please provide your Contact number.',
+  pickupDateRequired: 'Please provide valid Date.',
+  paymentRequired: 'Please select the Paymeny Method.',
+  confirmationHeading: 'Form Confirmation page for Automation Testing Practice',
+  confirmationMessage: 'Thank you for validating your ticket',
+};

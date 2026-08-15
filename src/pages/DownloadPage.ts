@@ -2,8 +2,12 @@ import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class DownloadPage extends BasePage {
+  /** Every downloadable file link on the page — a shared, ever-growing list (every visitor's uploads land here too), so tests only ever assert there's *at least one*, never an exact count. */
+  readonly fileLinks: Locator;
+
   constructor(page: Page) {
     super(page);
+    this.fileLinks = this.page.locator('a[data-testid]');
   }
 
   async goto(): Promise<void> {
@@ -13,6 +17,14 @@ export class DownloadPage extends BasePage {
   /** Each download link is tagged data-testid="<storedFileName>" — a stable, style-independent locator. */
   downloadLink(storedFileName: string): Locator {
     return this.page.getByTestId(storedFileName);
+  }
+
+  /** Stored filenames (the same value each link's data-testid carries) of every file currently listed. */
+  async listedFileNames(): Promise<string[]> {
+    return this.perform('Read the list of downloadable files', async () => {
+      const names = await this.fileLinks.evaluateAll((links) => links.map((link) => link.getAttribute('data-testid')));
+      return names.filter((name): name is string => name !== null);
+    });
   }
 
   async isFileListed(storedFileName: string): Promise<boolean> {
