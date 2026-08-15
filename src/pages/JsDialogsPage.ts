@@ -51,4 +51,12 @@ export class JsDialogsPage extends BasePage {
       await this.promptButton.click();
     });
   }
+
+  /** Cancelling a JS prompt() resolves it to `null`; the page's own log() then sets #dialog-response.innerHTML = null, which the DOM coerces to an empty string. */
+  async dismissPrompt(): Promise<void> {
+    await this.perform('Trigger JS prompt dialog and click Cancel', async () => {
+      this.page.once('dialog', (dialog) => void dialog.dismiss());
+      await this.promptButton.click();
+    });
+  }
 }

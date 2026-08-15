@@ -12,6 +12,13 @@ import { RedirectorPage } from '../pages/RedirectorPage';
 import { FormValidationPage } from '../pages/FormValidationPage';
 import { WindowsPage } from '../pages/WindowsPage';
 import { IframePage } from '../pages/IframePage';
+import { JQueryMenuPage } from '../pages/JQueryMenuPage';
+import { SecureDownloadPage } from '../pages/SecureDownloadPage';
+import { SlowResourcesPage } from '../pages/SlowResourcesPage';
+import { DropdownListPage } from '../pages/DropdownListPage';
+import { ChallengingDomPage } from '../pages/ChallengingDomPage';
+import { DynamicLoadingPage } from '../pages/DynamicLoadingPage';
+import { DynamicControlsPage } from '../pages/DynamicControlsPage';
 import { NotesLoginPage } from '../pages/notes-app/NotesLoginPage';
 import { NotesListPage } from '../pages/notes-app/NotesListPage';
 import { captureStep, captureStepFailure } from '../utils/screenshotRecorder';
@@ -44,6 +51,13 @@ export interface UiFixtures {
   formValidationPage: FormValidationPage;
   windowsPage: WindowsPage;
   iframePage: IframePage;
+  jQueryMenuPage: JQueryMenuPage;
+  secureDownloadPage: SecureDownloadPage;
+  slowResourcesPage: SlowResourcesPage;
+  dropdownListPage: DropdownListPage;
+  challengingDomPage: ChallengingDomPage;
+  dynamicLoadingPage: DynamicLoadingPage;
+  dynamicControlsPage: DynamicControlsPage;
   notesLoginPage: NotesLoginPage;
   notesListPage: NotesListPage;
   /** BDD-style step wrapper for the extent-report: step(title, fn) / step.given|when|then|and|but(title, fn). */
@@ -125,6 +139,13 @@ export const test = apiTest.extend<UiFixtures>({
   formValidationPage: async ({ page }, use) => use(new FormValidationPage(page)),
   windowsPage: async ({ page }, use) => use(new WindowsPage(page)),
   iframePage: async ({ page }, use) => use(new IframePage(page)),
+  jQueryMenuPage: async ({ page }, use) => use(new JQueryMenuPage(page)),
+  secureDownloadPage: async ({ page }, use) => use(new SecureDownloadPage(page)),
+  slowResourcesPage: async ({ page }, use) => use(new SlowResourcesPage(page)),
+  dropdownListPage: async ({ page }, use) => use(new DropdownListPage(page)),
+  challengingDomPage: async ({ page }, use) => use(new ChallengingDomPage(page)),
+  dynamicLoadingPage: async ({ page }, use) => use(new DynamicLoadingPage(page)),
+  dynamicControlsPage: async ({ page }, use) => use(new DynamicControlsPage(page)),
   notesLoginPage: async ({ page }, use) => use(new NotesLoginPage(page)),
   notesListPage: async ({ page }, use) => use(new NotesListPage(page)),
 

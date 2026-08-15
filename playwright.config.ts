@@ -26,6 +26,13 @@ export default defineConfig({
     video: 'retain-on-failure',
     actionTimeout: 10_000,
     navigationTimeout: 15_000,
+    // Only ever sent when a page actually challenges with a 401 (e.g.
+    // /download-secure, /basic-auth) — harmless for the rest of the suite,
+    // which never gets challenged and so never sends it.
+    httpCredentials: {
+      username: env.basicAuthUsername,
+      password: env.basicAuthPassword,
+    },
   },
   projects: [
     // tests/api/** never touches a browser (only `request`), so it only

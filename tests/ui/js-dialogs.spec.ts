@@ -59,4 +59,14 @@ test.describe('JavaScript dialogs', () => {
       });
     },
   );
+
+  test('cancelling the JS prompt clears the response', { tag: ['@regression'] }, async ({ jsDialogsPage, step }) => {
+    await step.when('the user triggers the JS prompt and clicks Cancel', async () => {
+      await jsDialogsPage.dismissPrompt();
+    });
+
+    await step.then('no response text is recorded', async () => {
+      await expect(jsDialogsPage.dialogResponse, 'dialog response').toHaveText('');
+    });
+  });
 });
