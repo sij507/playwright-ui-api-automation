@@ -1,0 +1,109 @@
+version: 2.1
+
+jobs:
+  test:
+    parameters:
+      tag:
+        type: string
+        description: "Test tag to filter by, e.g. @smoke"
+      project_flag:
+        type: string
+        default: "--project=chromium"
+        description: "Playwright --project flag(s). Empty string runs every configured browser project."
+      parallelism:
+        type: integer
+        default: 1
+        description: "Number of parallel containers to shard this job's tests across."
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.62.1-jammy
+    resource_class: medium
+    parallelism: << parameters.parallelism >>
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - npm-cache-v1-{{ checksum "package-lock.json" }}
+            - npm-cache-v1-
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - save_cache:
+          key: npm-cache-v1-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          # CIRCLE_NODE_INDEX/CIRCLE_NODE_TOTAL are always set (0 and 1 when
+          # parallelism isn't overridden above), so --shard is always 1/1 —
+          # i.e. a no-op — for jobs that don't opt into parallelism.
+          name: Run << parameters.tag >> tests
+          command: npx playwright test --grep "<< parameters.tag >>" << parameters.project_flag >> --shard=$((CIRCLE_NODE_INDEX+1))/$CIRCLE_NODE_TOTAL
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+      - store_artifacts:
+          path: extent-report
+          destination: extent-report
+
+workflows:
+  # Fast sanity check on every push to main — kept to 1-3 tests (see @smoke
+  # tag in tests/) so feedback stays quick.
+  smoke-on-main:
+    jobs:
+      - test:
+          name: smoke
+          tag: "@smoke"
+          filters:
+            branches:
+              only: main
+
+  # Core auth/UI/API/file-upload workflows, once a week rather than on every
+  # push — see README for the schedule rationale.
+  critical-weekly:
+    triggers:
+      - schedule:
+          # Every Monday at 06:00 UTC.
+          cron: "0 6 * * 1"
+          filters:
+            branches:
+              only: main
+    jobs:
+      - test:
+          name: critical
+          tag: "@critical"
+
+  # Full cross-browser regression whenever a release branch is created or
+  # updated — never on a routine commit to main. Each browser is its own job
+  # (run in parallel, no `requires` between them), and each of those jobs is
+  # further split across 5 containers via CircleCI `parallelism` + Playwright
+  # `--shard` — so a single release-branch push spins up 15 containers total.
+  # Bump `parallelism` on any job independently (e.g. if chromium's suite is
+  # heavier, since API tests only run there) to trade more containers for a
+  # shorter wall-clock time.
+  regression-on-release:
+    jobs:
+      - test:
+          name: regression-chromium
+          tag: "@regression"
+          project_flag: "--project=chromium"
+          parallelism: 5
+          filters:
+            branches:
+              only: /^release(\/.*)?$/
+      - test:
+          name: regression-firefox
+          tag: "@regression"
+          project_flag: "--project=firefox"
+          parallelism: 5
+          filters:
+            branches:
+              only: /^release(\/.*)?$/
+      - test:
+          name: regression-webkit
+          tag: "@regression"
+          project_flag: "--project=webkit"
+          parallelism: 5
+          filters:
+            branches:
+              only: /^release(\/.*)?$/

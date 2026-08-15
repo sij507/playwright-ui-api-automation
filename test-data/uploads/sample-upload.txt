@@ -1,0 +1,1 @@
+This is a small sample text file used for upload automation tests.

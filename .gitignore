@@ -1,0 +1,12 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
+extent-report/
+test-data/downloads/*
+!test-data/downloads/.gitkeep
+.env
+*.log
+.DS_Store
