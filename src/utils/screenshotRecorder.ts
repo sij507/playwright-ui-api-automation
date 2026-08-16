@@ -57,8 +57,16 @@ export async function captureStep(page: Page | null, description: string): Promi
 
   if (page) {
     try {
-      const screenshot = await page.screenshot({ fullPage: true });
-      await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+      // JPEG at quality 40 instead of lossless PNG: with one embedded
+      // base64 screenshot per scenario step, a regression suite of even a
+      // few dozen tests balloons a self-contained report to tens of MB as
+      // PNG (each full-page capture routinely 200-400KB) — impractical to
+      // open, email, or upload as one file. Quality 40 stays clearly legible
+      // at the report's thumbnail/lightbox sizes (all a screenshot here
+      // needs to support) while cutting file size meaningfully further than
+      // higher quality settings — diminishing returns start well before 60.
+      const screenshot = await page.screenshot({ fullPage: true, type: 'jpeg', quality: 40 });
+      await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/jpeg' });
     } catch {
       // Page may already be closed/navigating away; the action's own
       // pass/fail state is still reported without a screenshot.
@@ -96,8 +104,16 @@ export async function captureStepFailure(page: Page | null, description: string,
 
   if (page) {
     try {
-      const screenshot = await page.screenshot({ fullPage: true });
-      await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+      // JPEG at quality 40 instead of lossless PNG: with one embedded
+      // base64 screenshot per scenario step, a regression suite of even a
+      // few dozen tests balloons a self-contained report to tens of MB as
+      // PNG (each full-page capture routinely 200-400KB) — impractical to
+      // open, email, or upload as one file. Quality 40 stays clearly legible
+      // at the report's thumbnail/lightbox sizes (all a screenshot here
+      // needs to support) while cutting file size meaningfully further than
+      // higher quality settings — diminishing returns start well before 60.
+      const screenshot = await page.screenshot({ fullPage: true, type: 'jpeg', quality: 40 });
+      await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/jpeg' });
     } catch {
       // Page may already be closed/navigating away.
     }
