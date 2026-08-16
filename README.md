@@ -183,14 +183,22 @@ release/*       →  @regression   →  Extent report
 
 - The smoke suite is deliberately tiny (see [Suite commands](#suite-commands)) so `master` gets fast feedback.
 - `regression-on-release` runs Chromium, Firefox, and WebKit as three parallel jobs (not one sequential job covering all three), so wall-clock time is roughly the slowest browser instead of the sum of all three.
-- Each of those three jobs is _also_ split across 5 containers via CircleCI's `parallelism` plus Playwright's own `--shard` — so a single release-branch push runs 15 containers total (`test-results`/`extent-report` are uploaded per-container, visible as separate nodes in the Artifacts tab). `parallelism` is a parameter on the shared `test` job (default `1`, a no-op — `--shard=1/1` just means "run everything"), so `smoke`/`critical` are unaffected; adjust `parallelism: 5` on any of the three regression jobs in `.circleci/config.yml` independently (e.g. chromium's suite is heavier since API tests only run there) to trade more concurrent containers for a shorter wall-clock time.
+- Each of those three jobs is _also_ split across 10 containers via CircleCI's `parallelism` plus Playwright's own `--shard` — so a single release-branch push runs 30 containers total (`test-results`/`extent-report` are uploaded per-container, visible as separate nodes in the Artifacts tab). `parallelism` is a parameter on the shared `test` job (default `1`, a no-op — `--shard=1/1` just means "run everything"), so `smoke`/`critical` are unaffected; adjust `parallelism: 10` on any of the three regression jobs in `.circleci/config.yml` independently (e.g. chromium's suite is heavier since API tests only run there) to trade more concurrent containers for a shorter wall-clock time.
 - A normal commit to `master` never triggers the full regression suite — only a push to a `release`/`release/*` branch does.
 - To change the schedule or branch patterns, edit the `filters`/`cron` values in `.circleci/config.yml`.
 
 **Artifacts** — every job stores, regardless of pass/fail:
 
 - `extent-report/` — the custom HTML report
-- `test-results/` — JUnit XML plus per-failure screenshots, videos, and traces (`npx playwright show-trace <file>` to open one)
+- `test-results/` — JUnit XML plus per-failure screenshots, videos, and traces (`preserveOutput: 'failures-only'` in `playwright.config.ts` means passing tests leave nothing here)
+
+**Viewing a trace.** `trace: 'retain-on-failure'` (see `playwright.config.ts`) means every failing test leaves a `trace.zip` — a full interactive timeline of that run: every action, before/after DOM snapshots, console logs, and network requests.
+
+```bash
+npx playwright show-trace test-results/<failing-test-folder>/trace.zip
+```
+
+This opens Playwright's Trace Viewer locally in a browser (the path is also printed at the end of a failing run). In CI, download `trace.zip` from the failed job's **Artifacts** tab first, then either run the command above against the downloaded file, or drag it straight onto [trace.playwright.dev](https://trace.playwright.dev) to view it in the same viewer with nothing to install.
 
 The job fails whenever any test fails, and retries are limited to `1` and CI-only (see `playwright.config.ts`) — enough to absorb a rare third-party network blip against the live practice site, never enough to mask a genuinely flaky test.
 
