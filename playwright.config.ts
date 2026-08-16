@@ -11,6 +11,13 @@ export default defineConfig({
   retries: env.isCI ? 1 : 0,
   workers: env.isCI ? 2 : undefined,
   timeout: 30_000,
+  // trace/screenshot/video below are all capture-on-failure only, so a
+  // passing test has nothing to put in its per-test test-results/ directory.
+  // Without this, Playwright's default ('always') creates and keeps that
+  // directory anyway, littering test-results/ with hundreds of empty
+  // folders; 'failures-only' deletes a test's output dir once it's known to
+  // have passed.
+  preserveOutput: 'failures-only',
   expect: {
     timeout: 8_000,
   },

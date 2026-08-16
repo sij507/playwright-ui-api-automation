@@ -76,18 +76,20 @@ workflows:
   # Full cross-browser regression whenever a release branch is created or
   # updated — never on a routine commit to main. Each browser is its own job
   # (run in parallel, no `requires` between them), and each of those jobs is
-  # further split across 5 containers via CircleCI `parallelism` + Playwright
-  # `--shard` — so a single release-branch push spins up 15 containers total.
-  # Bump `parallelism` on any job independently (e.g. if chromium's suite is
-  # heavier, since API tests only run there) to trade more containers for a
-  # shorter wall-clock time.
+  # further split across 10 containers via CircleCI `parallelism` + Playwright
+  # `--shard` — so a single release-branch push spins up 30 containers total,
+  # sharding the project's 213 @regression tests (87 chromium / 63 firefox /
+  # 63 webkit) down to a handful of tests per container. Bump `parallelism`
+  # on any job independently (e.g. if chromium's suite is heavier, since API
+  # tests only run there) to trade more containers for a shorter wall-clock
+  # time.
   regression-on-release:
     jobs:
       - test:
           name: regression-chromium
           tag: "@regression"
           project_flag: "--project=chromium"
-          parallelism: 5
+          parallelism: 10
           filters:
             branches:
               only: /^release(\/.*)?$/
@@ -95,7 +97,7 @@ workflows:
           name: regression-firefox
           tag: "@regression"
           project_flag: "--project=firefox"
-          parallelism: 5
+          parallelism: 10
           filters:
             branches:
               only: /^release(\/.*)?$/
@@ -103,7 +105,7 @@ workflows:
           name: regression-webkit
           tag: "@regression"
           project_flag: "--project=webkit"
-          parallelism: 5
+          parallelism: 10
           filters:
             branches:
               only: /^release(\/.*)?$/

@@ -19,6 +19,11 @@ export function uniqueNoteTitle(prefix = 'Note'): string {
   return `${prefix} ${uniqueSuffix()}`;
 }
 
+// No spaces, unlike uniqueName() — for fields validated as a plain username.
+export function uniqueUsername(prefix = 'qauser'): string {
+  return `${prefix}${uniqueSuffix()}`;
+}
+
 export function strongPassword(): string {
   return `Test!${uniqueSuffix()}Aa1`;
 }

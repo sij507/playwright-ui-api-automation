@@ -21,6 +21,12 @@ import { DynamicLoadingPage } from '../pages/DynamicLoadingPage';
 import { DynamicControlsPage } from '../pages/DynamicControlsPage';
 import { NotesLoginPage } from '../pages/notes-app/NotesLoginPage';
 import { NotesListPage } from '../pages/notes-app/NotesListPage';
+import { BookstoreListPage } from '../pages/bookstore/BookstoreListPage';
+import { BookstoreCartPage } from '../pages/bookstore/BookstoreCartPage';
+import { BookstoreSignupPage } from '../pages/bookstore/BookstoreSignupPage';
+import { BookstoreSigninPage } from '../pages/bookstore/BookstoreSigninPage';
+import { BookstoreCheckoutPage } from '../pages/bookstore/BookstoreCheckoutPage';
+import { BookstoreProfilePage } from '../pages/bookstore/BookstoreProfilePage';
 import { captureStep, captureStepFailure } from '../utils/screenshotRecorder';
 import { takePendingDescription } from '../utils/pendingNavigation';
 import { blockAdsAndTrackers } from '../utils/adBlocker';
@@ -60,6 +66,12 @@ export interface UiFixtures {
   dynamicControlsPage: DynamicControlsPage;
   notesLoginPage: NotesLoginPage;
   notesListPage: NotesListPage;
+  bookstoreListPage: BookstoreListPage;
+  bookstoreCartPage: BookstoreCartPage;
+  bookstoreSignupPage: BookstoreSignupPage;
+  bookstoreSigninPage: BookstoreSigninPage;
+  bookstoreCheckoutPage: BookstoreCheckoutPage;
+  bookstoreProfilePage: BookstoreProfilePage;
   /** BDD-style step wrapper for the extent-report: step(title, fn) / step.given|when|then|and|but(title, fn). */
   step: StepFn;
 }
@@ -148,6 +160,12 @@ export const test = apiTest.extend<UiFixtures>({
   dynamicControlsPage: async ({ page }, use) => use(new DynamicControlsPage(page)),
   notesLoginPage: async ({ page }, use) => use(new NotesLoginPage(page)),
   notesListPage: async ({ page }, use) => use(new NotesListPage(page)),
+  bookstoreListPage: async ({ page }, use) => use(new BookstoreListPage(page)),
+  bookstoreCartPage: async ({ page }, use) => use(new BookstoreCartPage(page)),
+  bookstoreSignupPage: async ({ page }, use) => use(new BookstoreSignupPage(page)),
+  bookstoreSigninPage: async ({ page }, use) => use(new BookstoreSigninPage(page)),
+  bookstoreCheckoutPage: async ({ page }, use) => use(new BookstoreCheckoutPage(page)),
+  bookstoreProfilePage: async ({ page }, use) => use(new BookstoreProfilePage(page)),
 
   // eslint-disable-next-line no-empty-pattern -- Playwright fixture DI requires a destructured first param even when unused.
   step: async ({}, use) => {
